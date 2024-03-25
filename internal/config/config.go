@@ -1,13 +1,13 @@
 package config
 
 import (
-	"github.com/knadh/koanf/v2"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 )
 
 type Config struct {
-	Workers int `koanf:"workers"`
+	Workers         int    `koanf:"workers"`
 	OutputDirectory string `koanf:"outputDirectory`
 }
 
@@ -27,5 +27,3 @@ func LoadConfig() (Config, error) {
 
 	return conf, nil
 }
-
-

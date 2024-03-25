@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log/slog"
 	"flag"
+	"log/slog"
 	"net/url"
 	"os"
 
@@ -16,6 +16,7 @@ type UrlFetcher interface {
 
 // Setup command line flags
 var meta *bool
+
 func init() {
 	meta = flag.Bool("metadata", false, "Display metadata, default to false")
 }
@@ -26,7 +27,7 @@ func init() {
 func worker(id int, urlChan <-chan string, errChan chan<- error, fetcher UrlFetcher) {
 	for url := range urlChan {
 		errChan <- fetcher.Fetch(url)
-    }
+	}
 }
 
 // sanitizeArgs sanitizes command line arguments and keeps only the valid URLs
@@ -62,30 +63,30 @@ func main() {
 
 	flag.Parse()
 	urls := sanitizeArgs(flag.Args())
-	
-    urlChan := make(chan string, len(urls))
-    errChan := make(chan error, len(urls))
+
+	urlChan := make(chan string, len(urls))
+	errChan := make(chan error, len(urls))
 
 	fetcher := f.InitFetcher(conf.OutputDirectory, meta)
 
 	// Initialize a concurrent worker for each URL
 	// send URLs to fetch thru a channel
-    for w := 0; w < conf.Workers; w++ {
-        go worker(w, urlChan, errChan, fetcher)
-    }
+	for w := 0; w < conf.Workers; w++ {
+		go worker(w, urlChan, errChan, fetcher)
+	}
 
-    for i := 0; i < len(urls); i++ {
-        urlChan <- urls[i]
-    }
-    close(urlChan)
+	for i := 0; i < len(urls); i++ {
+		urlChan <- urls[i]
+	}
+	close(urlChan)
 
 	// Collect results thru channel from each worker, and exit main when all URLs have been finished processing
-    for a := 1; a <= len(urls); a++ {
-        err = <-errChan
+	for a := 1; a <= len(urls); a++ {
+		err = <-errChan
 
 		if err != nil {
 			slog.Error(err.Error())
 		}
-    }
+	}
 	close(errChan)
 }

@@ -1,18 +1,18 @@
 package fetcher
 
 import (
+	"bytes"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path"
-	"net/http"
-	"bytes"
 	"time"
 )
 
 type UrlFetcher struct {
 	outputDir string
-	meta *bool
+	meta      *bool
 }
 
 // InitFetcher initializes a fetcher
@@ -52,10 +52,10 @@ func (f *UrlFetcher) Fetch(url string) error {
 
 // displayMetaData counts the links and images of a HTML body, and print out the info
 func displayMetaData(url string, data []byte) {
-	linkCount := bytes.Count(data,  []byte("</a>"))
-	imgCount := bytes.Count(data,  []byte("<img "))
+	linkCount := bytes.Count(data, []byte("</a>"))
+	imgCount := bytes.Count(data, []byte("<img "))
 	t := time.Now()
-	
+
 	fmt.Printf("site: %s\n", url)
 	fmt.Printf("num_links: %d\n", linkCount)
 	fmt.Printf("images: %d\n", imgCount)
